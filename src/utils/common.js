@@ -14,4 +14,8 @@ function isEscapeKey(evt) {
   return evt.key === 'Escape';
 }
 
-export {getRandomInteger, getRandomArrayElement, isEscapeKey};
+function updateItem(items, update) {
+  return items.map((item) => item.id === update.id ? update : item);
+}
+
+export {getRandomInteger, getRandomArrayElement, isEscapeKey, updateItem};
