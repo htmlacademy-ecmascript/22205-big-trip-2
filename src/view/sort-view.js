@@ -21,6 +21,7 @@ function createSortItemTemplate({type, label, isDisabled}, isChecked) {
         type="radio"
         name="trip-sort"
         value="sort-${type}"
+        data-sort-type="${type}"
         ${checkedAttr}
         ${disabledAttr}
       >
@@ -43,13 +44,25 @@ function createSortTemplate(currentSortType) {
 
 export default class SortView extends AbstractView {
   #currentSortType = null;
+  #handleSortTypeChange = null;
 
-  constructor({currentSortType = SortType.DAY} = {}) {
+  constructor({currentSortType = SortType.DAY, onSortTypeChange} = {}) {
     super();
     this.#currentSortType = currentSortType;
+    this.#handleSortTypeChange = onSortTypeChange;
+
+    this.element.addEventListener('change', this.#sortTypeChangeHandler);
   }
 
   get template() {
     return createSortTemplate(this.#currentSortType);
   }
+
+  #sortTypeChangeHandler = (evt) => {
+    if (!evt.target.dataset.sortType) {
+      return;
+    }
+
+    this.#handleSortTypeChange(evt.target.dataset.sortType);
+  };
 }
