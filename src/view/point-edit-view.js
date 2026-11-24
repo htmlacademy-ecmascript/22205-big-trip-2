@@ -217,16 +217,25 @@ export default class PointEditView extends AbstractStatefulView {
   #destinations = [];
   #offers = [];
   #handleFormSubmit = null;
+  #handleDeleteClick = null;
   #handleRollupClick = null;
   #datepickerFrom = null;
   #datepickerTo = null;
 
-  constructor({point = BLANK_POINT, destinations = [], offers = [], onFormSubmit, onRollupClick} = {}) {
+  constructor({
+    point = BLANK_POINT,
+    destinations = [],
+    offers = [],
+    onFormSubmit,
+    onDeleteClick,
+    onRollupClick,
+  } = {}) {
     super();
     this._setState(PointEditView.parsePointToState(point));
     this.#destinations = destinations;
     this.#offers = offers;
     this.#handleFormSubmit = onFormSubmit;
+    this.#handleDeleteClick = onDeleteClick;
     this.#handleRollupClick = onRollupClick;
 
     this._restoreHandlers();
@@ -263,6 +272,9 @@ export default class PointEditView extends AbstractStatefulView {
   _restoreHandlers() {
     this.element.querySelector('form')
       .addEventListener('submit', this.#formSubmitHandler);
+
+    this.element.querySelector('.event__reset-btn')
+      .addEventListener('click', this.#deleteClickHandler);
 
     this.element.querySelector('.event__rollup-btn')
       ?.addEventListener('click', this.#rollupClickHandler);
@@ -309,9 +321,29 @@ export default class PointEditView extends AbstractStatefulView {
     );
   }
 
+  #isValidState() {
+    const hasDestination = Boolean(this._state.destination);
+    const hasValidDates = Boolean(this._state.dateFrom && this._state.dateTo) &&
+      !dayjs(this._state.dateTo).isBefore(dayjs(this._state.dateFrom));
+    const hasValidPrice = Number.isInteger(this._state.basePrice) && this._state.basePrice > 0;
+
+    return hasDestination && hasValidDates && hasValidPrice;
+  }
+
   #formSubmitHandler = (evt) => {
     evt.preventDefault();
+
+    if (!this.#isValidState()) {
+      this.shake();
+      return;
+    }
+
     this.#handleFormSubmit(PointEditView.parseStateToPoint(this._state));
+  };
+
+  #deleteClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleDeleteClick(PointEditView.parseStateToPoint(this._state));
   };
 
   #rollupClickHandler = (evt) => {
@@ -358,10 +390,11 @@ export default class PointEditView extends AbstractStatefulView {
 
   #priceInputHandler = (evt) => {
     evt.preventDefault();
-    const numericValue = Number(evt.target.value);
+    const sanitizedValue = evt.target.value.replace(/\D/g, '');
+    evt.target.value = sanitizedValue;
 
     this._setState({
-      basePrice: Number.isNaN(numericValue) ? 0 : numericValue,
+      basePrice: Number(sanitizedValue),
     });
   };
 

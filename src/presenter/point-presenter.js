@@ -1,3 +1,4 @@
+import {UpdateType, UserAction} from '../const.js';
 import {remove, render, replace} from '../framework/render.js';
 import {isEscapeKey} from '../utils/common.js';
 import PointEditView from '../view/point-edit-view.js';
@@ -46,6 +47,7 @@ export default class PointPresenter {
       destinations: this.#pointsModel.destinations,
       offers: this.#pointsModel.offers,
       onFormSubmit: this.#handleFormSubmit,
+      onDeleteClick: this.#handleDeleteClick,
       onRollupClick: this.#handleRollupClick,
     });
 
@@ -105,12 +107,28 @@ export default class PointPresenter {
   };
 
   #handleFavoriteClick = () => {
-    this.#handleDataChange({...this.#point, isFavorite: !this.#point.isFavorite});
+    this.#handleDataChange(
+      UserAction.UPDATE_POINT,
+      UpdateType.PATCH,
+      {...this.#point, isFavorite: !this.#point.isFavorite}
+    );
   };
 
-  #handleFormSubmit = (point) => {
+  #handleFormSubmit = (update) => {
     this.#replaceFormToCard();
-    this.#handleDataChange(point);
+    this.#handleDataChange(
+      UserAction.UPDATE_POINT,
+      UpdateType.MINOR,
+      update
+    );
+  };
+
+  #handleDeleteClick = (point) => {
+    this.#handleDataChange(
+      UserAction.DELETE_POINT,
+      UpdateType.MINOR,
+      point
+    );
   };
 
   #handleRollupClick = () => {
