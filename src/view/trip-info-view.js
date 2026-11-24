@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 import he from 'he';
-import {createElement} from '../render.js';
+import AbstractView from '../framework/view/abstract-view.js';
 import {humanizeTripInfoDate} from '../utils/date.js';
 
 const MAX_DISPLAYED_CITIES = 3;
@@ -76,35 +76,23 @@ function createTripInfoTemplate({points, destinations, offers}) {
   );
 }
 
-export default class TripInfoView {
-  #element = null;
+export default class TripInfoView extends AbstractView {
   #points = [];
   #destinations = [];
   #offers = [];
 
   constructor({points, destinations, offers}) {
+    super();
     this.#points = points;
     this.#destinations = destinations;
     this.#offers = offers;
   }
 
-  getTemplate() {
+  get template() {
     return createTripInfoTemplate({
       points: this.#points,
       destinations: this.#destinations,
       offers: this.#offers,
     });
-  }
-
-  getElement() {
-    if (!this.#element) {
-      this.#element = createElement(this.getTemplate());
-    }
-
-    return this.#element;
-  }
-
-  removeElement() {
-    this.#element = null;
   }
 }

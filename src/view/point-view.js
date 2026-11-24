@@ -1,5 +1,5 @@
 import he from 'he';
-import {createElement} from '../render.js';
+import AbstractView from '../framework/view/abstract-view.js';
 import {
   humanizePointDate,
   formatPointDateAttr,
@@ -74,19 +74,24 @@ function createPointTemplate({point, destination, offers}) {
   );
 }
 
-export default class PointView {
-  #element = null;
+export default class PointView extends AbstractView {
   #point = null;
   #destination = null;
   #offers = [];
+  #handleEditClick = null;
 
-  constructor({point, destination, offers}) {
+  constructor({point, destination, offers, onEditClick}) {
+    super();
     this.#point = point;
     this.#destination = destination;
     this.#offers = offers;
+    this.#handleEditClick = onEditClick;
+
+    this.element.querySelector('.event__rollup-btn')
+      .addEventListener('click', this.#rollupClickHandler);
   }
 
-  getTemplate() {
+  get template() {
     return createPointTemplate({
       point: this.#point,
       destination: this.#destination,
@@ -94,15 +99,8 @@ export default class PointView {
     });
   }
 
-  getElement() {
-    if (!this.#element) {
-      this.#element = createElement(this.getTemplate());
-    }
-
-    return this.#element;
-  }
-
-  removeElement() {
-    this.#element = null;
-  }
+  #rollupClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleEditClick();
+  };
 }
