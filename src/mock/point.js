@@ -70,14 +70,13 @@ const PictureIndex = {
 };
 
 const MOCK_POINT_OFFSETS = [
-  {startDays: 0, startHours: 10, startMinutes: 30, durationMinutes: 30},
-  {startDays: 0, startHours: 12, startMinutes: 25, durationMinutes: 164},
-  {startDays: 1, startHours: 8, startMinutes: 0, durationMinutes: 1590},
-  {startDays: 3, startHours: 14, startMinutes: 15, durationMinutes: 75},
+  {startDays: -3, startHours: 0, startMinutes: 0, durationMinutes: 30},
+  {startDays: 0, startHours: -2, startMinutes: 0, durationMinutes: 360},
+  {startDays: 1, startHours: 2, startMinutes: 0, durationMinutes: 1590},
+  {startDays: 3, startHours: 4, startMinutes: 15, durationMinutes: 75},
 ];
 
 const EMPTY_OFFERS_TYPE = 'restaurant';
-const BASE_DATE_MS = Date.UTC(2026, 2, 18, 0, 0);
 const MS_IN_MINUTE = 60 * 1000;
 const MS_IN_HOUR = 60 * MS_IN_MINUTE;
 const MS_IN_DAY = 24 * MS_IN_HOUR;
@@ -143,7 +142,7 @@ function createPoints(destinations, offersByType) {
       .map((offer) => offer.id);
 
     const startTimestamp =
-      BASE_DATE_MS +
+      Date.now() +
       offset.startDays * MS_IN_DAY +
       offset.startHours * MS_IN_HOUR +
       offset.startMinutes * MS_IN_MINUTE;
