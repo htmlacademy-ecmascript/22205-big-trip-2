@@ -1,4 +1,5 @@
-import {RenderPosition, render} from '../render.js';
+import {RenderPosition, render, replace} from '../framework/render.js';
+import {isEscapeKey} from '../utils/common.js';
 import TripInfoView from '../view/trip-info-view.js';
 import FilterView from '../view/filter-view.js';
 import SortView from '../view/sort-view.js';
@@ -45,31 +46,48 @@ export default class TripPresenter {
   }
 
   #renderPoints() {
-    const pointListElement = this.#pointListComponent.getElement();
-
-    if (this.#points.length === 0) {
-      return;
-    }
-
-    render(
-      new PointEditView({
-        point: this.#points[0],
-        destinations: this.#pointsModel.destinations,
-        offers: this.#pointsModel.offers,
-      }),
-      pointListElement
-    );
-
-    this.#points.slice(1).forEach((point) => this.#renderPoint(point));
+    this.#points.forEach((point) => this.#renderPoint(point));
   }
 
   #renderPoint(point) {
+    const escKeydownHandler = (evt) => {
+      if (isEscapeKey(evt)) {
+        evt.preventDefault();
+        replaceFormToCard();
+      }
+    };
+
     const pointComponent = new PointView({
       point,
       destination: this.#pointsModel.getDestinationById(point.destination),
       offers: this.#pointsModel.getOffersByType(point.type),
+      onEditClick: () => {
+        replaceCardToForm();
+      },
     });
 
-    render(pointComponent, this.#pointListComponent.getElement());
+    const pointEditComponent = new PointEditView({
+      point,
+      destinations: this.#pointsModel.destinations,
+      offers: this.#pointsModel.offers,
+      onFormSubmit: () => {
+        replaceFormToCard();
+      },
+      onRollupClick: () => {
+        replaceFormToCard();
+      },
+    });
+
+    function replaceCardToForm() {
+      replace(pointEditComponent, pointComponent);
+      document.addEventListener('keydown', escKeydownHandler);
+    }
+
+    function replaceFormToCard() {
+      replace(pointComponent, pointEditComponent);
+      document.removeEventListener('keydown', escKeydownHandler);
+    }
+
+    render(pointComponent, this.#pointListComponent.element);
   }
 }
