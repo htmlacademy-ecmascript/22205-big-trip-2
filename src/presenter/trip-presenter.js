@@ -1,4 +1,5 @@
 import {RenderPosition, render, replace} from '../framework/render.js';
+import {generateFilter} from '../mock/filter.js';
 import {isEscapeKey} from '../utils/common.js';
 import TripInfoView from '../view/trip-info-view.js';
 import FilterView from '../view/filter-view.js';
@@ -6,6 +7,7 @@ import SortView from '../view/sort-view.js';
 import PointListView from '../view/point-list-view.js';
 import PointEditView from '../view/point-edit-view.js';
 import PointView from '../view/point-view.js';
+import NoPointView from '../view/no-point-view.js';
 
 export default class TripPresenter {
   #tripMainElement = null;
@@ -14,6 +16,7 @@ export default class TripPresenter {
   #pointsModel = null;
 
   #pointListComponent = new PointListView();
+  #noPointComponent = new NoPointView();
   #points = [];
 
   constructor({tripMainElement, tripFiltersElement, tripEventsElement, pointsModel}) {
@@ -25,24 +28,33 @@ export default class TripPresenter {
 
   init() {
     this.#points = [...this.#pointsModel.points];
+    const filters = generateFilter(this.#points);
 
-    if (this.#points.length > 0) {
-      render(
-        new TripInfoView({
-          points: this.#points,
-          destinations: this.#pointsModel.destinations,
-          offers: this.#pointsModel.offers,
-        }),
-        this.#tripMainElement,
-        RenderPosition.AFTERBEGIN
-      );
+    render(new FilterView({filters}), this.#tripFiltersElement);
+
+    if (this.#points.length === 0) {
+      this.#renderNoPoints();
+      return;
     }
 
-    render(new FilterView(), this.#tripFiltersElement);
+    render(
+      new TripInfoView({
+        points: this.#points,
+        destinations: this.#pointsModel.destinations,
+        offers: this.#pointsModel.offers,
+      }),
+      this.#tripMainElement,
+      RenderPosition.AFTERBEGIN
+    );
+
     render(new SortView(), this.#tripEventsElement);
     render(this.#pointListComponent, this.#tripEventsElement);
 
     this.#renderPoints();
+  }
+
+  #renderNoPoints() {
+    render(this.#noPointComponent, this.#tripEventsElement);
   }
 
   #renderPoints() {

@@ -12,4 +12,19 @@ const POINT_TYPES = [
 
 const DEFAULT_TYPE = 'flight';
 
-export {POINT_TYPES, DEFAULT_TYPE};
+const FilterType = {
+  EVERYTHING: 'everything',
+  FUTURE: 'future',
+  PRESENT: 'present',
+  PAST: 'past',
+};
+
+const SortType = {
+  DAY: 'day',
+  EVENT: 'event',
+  TIME: 'time',
+  PRICE: 'price',
+  OFFERS: 'offer',
+};
+
+export {POINT_TYPES, DEFAULT_TYPE, FilterType, SortType};
