@@ -1,13 +1,13 @@
-import dayjs from 'dayjs';
 import he from 'he';
 import AbstractView from '../framework/view/abstract-view.js';
 import {humanizeTripInfoDate} from '../utils/date.js';
+import {sortByDay} from '../utils/point.js';
 
 const MAX_DISPLAYED_CITIES = 3;
 
-function getTripTitle(sortedPoints, destinationMap) {
+function getTripTitle(sortedPoints, destinationById) {
   const cityNames = sortedPoints
-    .map((point) => destinationMap.get(point.destination))
+    .map((point) => destinationById.get(point.destination))
     .filter(Boolean);
 
   if (cityNames.length === 0) {
@@ -33,7 +33,7 @@ function getTripDates(sortedPoints) {
 }
 
 function getTotalCost(points, offersByType) {
-  const offersByTypeMap = new Map(
+  const offerPricesByType = new Map(
     offersByType.map(({type, offers}) => [
       type,
       new Map(offers.map((offer) => [offer.id, offer.price])),
@@ -41,9 +41,9 @@ function getTotalCost(points, offersByType) {
   );
 
   return points.reduce((total, point) => {
-    const typeOfferPrices = offersByTypeMap.get(point.type);
+    const offerPrices = offerPricesByType.get(point.type);
     const offersCost = point.offers.reduce(
-      (sum, offerId) => sum + (typeOfferPrices?.get(offerId) ?? 0),
+      (sum, offerId) => sum + (offerPrices?.get(offerId) ?? 0),
       0
     );
 
@@ -52,12 +52,10 @@ function getTotalCost(points, offersByType) {
 }
 
 function createTripInfoTemplate({points, destinations, offers}) {
-  const sortedPoints = [...points].sort((pointA, pointB) =>
-    dayjs(pointA.dateFrom).diff(dayjs(pointB.dateFrom))
-  );
-  const destinationMap = new Map(destinations.map((destination) => [destination.id, destination.name]));
+  const sortedPoints = [...points].sort(sortByDay);
+  const destinationById = new Map(destinations.map((destination) => [destination.id, destination.name]));
 
-  const title = getTripTitle(sortedPoints, destinationMap);
+  const title = getTripTitle(sortedPoints, destinationById);
   const dates = getTripDates(sortedPoints);
   const totalCost = getTotalCost(points, offers);
 

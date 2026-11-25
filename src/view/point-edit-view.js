@@ -20,13 +20,13 @@ const BLANK_POINT = {
 };
 
 function createEventTypeItemTemplate(pointType, currentType, pointId, isDisabled) {
-  const checkedAttr = pointType === currentType ? 'checked' : '';
-  const disabledAttr = isDisabled ? 'disabled' : '';
+  const checkedAttribute = pointType === currentType ? 'checked' : '';
+  const disabledAttribute = isDisabled ? 'disabled' : '';
   const label = `${pointType.charAt(0).toUpperCase()}${pointType.slice(1)}`;
 
   return (
     `<div class="event__type-item">
-      <input id="event-type-${pointType}-${pointId}" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${pointType}" ${checkedAttr} ${disabledAttr}>
+      <input id="event-type-${pointType}-${pointId}" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${pointType}" ${checkedAttribute} ${disabledAttribute}>
       <label class="event__type-label  event__type-label--${pointType}" for="event-type-${pointType}-${pointId}">${label}</label>
     </div>`
   );
@@ -44,16 +44,16 @@ function createDestinationListTemplate(destinations, pointId) {
   );
 }
 
-function createOffersSectionTemplate(availableOffers, selectedOfferIds, pointId, isDisabled) {
+function createOffersSectionTemplate(availableOffers, offerIds, pointId, isDisabled) {
   if (availableOffers.length === 0) {
     return '';
   }
 
-  const selectedOfferIdSet = new Set(selectedOfferIds);
-  const disabledAttr = isDisabled ? 'disabled' : '';
+  const selectedOfferIds = new Set(offerIds);
+  const disabledAttribute = isDisabled ? 'disabled' : '';
   const offersMarkup = availableOffers
     .map(({id, title, price}) => {
-      const checkedAttr = selectedOfferIdSet.has(id) ? 'checked' : '';
+      const checkedAttribute = selectedOfferIds.has(id) ? 'checked' : '';
       const encodedId = he.encode(id);
       const inputId = `event-offer-${encodedId}-${pointId}`;
 
@@ -65,8 +65,8 @@ function createOffersSectionTemplate(availableOffers, selectedOfferIds, pointId,
             type="checkbox"
             name="event-offer-${encodedId}"
             data-offer-id="${encodedId}"
-            ${checkedAttr}
-            ${disabledAttr}
+            ${checkedAttribute}
+            ${disabledAttribute}
           >
           <label class="event__offer-label" for="${inputId}">
             <span class="event__offer-title">${he.encode(title)}</span>
@@ -149,7 +149,7 @@ function createPointEditTemplate({state, destinations, offers}) {
   } = state;
   const isEditMode = Boolean(id);
   const pointId = id || 'new';
-  const disabledAttr = isDisabled ? 'disabled' : '';
+  const disabledAttribute = isDisabled ? 'disabled' : '';
 
   const currentDestination = destinations.find((item) => item.id === destinationId) || null;
   const typeOffersGroup = offers.find((item) => item.type === type);
@@ -163,7 +163,7 @@ function createPointEditTemplate({state, destinations, offers}) {
   const deleteButtonText = isDeleting ? 'Deleting...' : 'Delete';
   const resetButtonText = isEditMode ? deleteButtonText : 'Cancel';
   const rollupButtonTemplate = isEditMode
-    ? `<button class="event__rollup-btn" type="button" ${disabledAttr}>
+    ? `<button class="event__rollup-btn" type="button" ${disabledAttribute}>
         <span class="visually-hidden">Open event</span>
       </button>`
     : '';
@@ -186,7 +186,7 @@ function createPointEditTemplate({state, destinations, offers}) {
               <span class="visually-hidden">Choose event type</span>
               <img class="event__type-icon" width="17" height="17" src="img/icons/${he.encode(type)}.png" alt="Event type icon">
             </label>
-            <input class="event__type-toggle  visually-hidden" id="event-type-toggle-${pointId}" type="checkbox" ${disabledAttr}>
+            <input class="event__type-toggle  visually-hidden" id="event-type-toggle-${pointId}" type="checkbox" ${disabledAttribute}>
 
             <div class="event__type-list">
               <fieldset class="event__type-group">
@@ -200,16 +200,16 @@ function createPointEditTemplate({state, destinations, offers}) {
             <label class="event__label  event__type-output" for="event-destination-${pointId}">
               ${he.encode(type)}
             </label>
-            <input class="event__input  event__input--destination" id="event-destination-${pointId}" type="text" name="event-destination" value="${destinationName}" list="destination-list-${pointId}" ${disabledAttr}>
+            <input class="event__input  event__input--destination" id="event-destination-${pointId}" type="text" name="event-destination" value="${destinationName}" list="destination-list-${pointId}" ${disabledAttribute}>
             ${createDestinationListTemplate(destinations, pointId)}
           </div>
 
           <div class="event__field-group  event__field-group--time">
             <label class="visually-hidden" for="event-start-time-${pointId}">From</label>
-            <input class="event__input  event__input--time" id="event-start-time-${pointId}" type="text" name="event-start-time" value="${formatEditDateTime(dateFrom)}" ${disabledAttr}>
+            <input class="event__input  event__input--time" id="event-start-time-${pointId}" type="text" name="event-start-time" value="${formatEditDateTime(dateFrom)}" ${disabledAttribute}>
             &mdash;
             <label class="visually-hidden" for="event-end-time-${pointId}">To</label>
-            <input class="event__input  event__input--time" id="event-end-time-${pointId}" type="text" name="event-end-time" value="${formatEditDateTime(dateTo)}" ${disabledAttr}>
+            <input class="event__input  event__input--time" id="event-end-time-${pointId}" type="text" name="event-end-time" value="${formatEditDateTime(dateTo)}" ${disabledAttribute}>
           </div>
 
           <div class="event__field-group  event__field-group--price">
@@ -217,11 +217,11 @@ function createPointEditTemplate({state, destinations, offers}) {
               <span class="visually-hidden">Price</span>
               &euro;
             </label>
-            <input class="event__input  event__input--price" id="event-price-${pointId}" type="text" name="event-price" value="${basePrice}" ${disabledAttr}>
+            <input class="event__input  event__input--price" id="event-price-${pointId}" type="text" name="event-price" value="${basePrice}" ${disabledAttribute}>
           </div>
 
-          <button class="event__save-btn  btn  btn--blue" type="submit" ${disabledAttr}>${saveButtonText}</button>
-          <button class="event__reset-btn" type="reset" ${disabledAttr}>${resetButtonText}</button>
+          <button class="event__save-btn  btn  btn--blue" type="submit" ${disabledAttribute}>${saveButtonText}</button>
+          <button class="event__reset-btn" type="reset" ${disabledAttribute}>${resetButtonText}</button>
           ${rollupButtonTemplate}
         </header>
         ${detailsTemplate}

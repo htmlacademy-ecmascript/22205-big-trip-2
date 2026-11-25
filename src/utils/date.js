@@ -7,9 +7,9 @@ const PAD_LENGTH = 2;
 
 const DateFormat = {
   POINT_DATE: 'MMM D',
-  POINT_DATE_ATTR: 'YYYY-MM-DD',
+  POINT_DATE_ATTRIBUTE: 'YYYY-MM-DD',
   POINT_TIME: 'HH:mm',
-  POINT_DATETIME_ATTR: 'YYYY-MM-DDTHH:mm',
+  POINT_DATETIME_ATTRIBUTE: 'YYYY-MM-DDTHH:mm',
   EDIT_DATETIME: 'DD/MM/YY HH:mm',
   TRIP_INFO_DATE: 'D MMM',
 };
@@ -22,16 +22,16 @@ function humanizePointDate(date) {
   return date ? dayjs(date).format(DateFormat.POINT_DATE) : '';
 }
 
-function formatPointDateAttr(date) {
-  return date ? dayjs(date).format(DateFormat.POINT_DATE_ATTR) : '';
+function formatPointDateAttribute(date) {
+  return date ? dayjs(date).format(DateFormat.POINT_DATE_ATTRIBUTE) : '';
 }
 
 function humanizePointTime(date) {
   return date ? dayjs(date).format(DateFormat.POINT_TIME) : '';
 }
 
-function formatPointDateTimeAttr(date) {
-  return date ? dayjs(date).format(DateFormat.POINT_DATETIME_ATTR) : '';
+function formatPointDateTimeAttribute(date) {
+  return date ? dayjs(date).format(DateFormat.POINT_DATETIME_ATTRIBUTE) : '';
 }
 
 function formatEditDateTime(date) {
@@ -61,9 +61,9 @@ function getPointDuration(dateFrom, dateTo) {
 
 export {
   humanizePointDate,
-  formatPointDateAttr,
+  formatPointDateAttribute,
   humanizePointTime,
-  formatPointDateTimeAttr,
+  formatPointDateTimeAttribute,
   formatEditDateTime,
   humanizeTripInfoDate,
   getPointDuration,
