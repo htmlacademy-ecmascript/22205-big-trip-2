@@ -20,6 +20,7 @@ export default class PointPresenter {
 
   #point = null;
   #mode = Mode.DEFAULT;
+  #isPending = false;
 
   constructor({pointListContainer, pointsModel, onDataChange, onModeChange}) {
     this.#pointListContainer = pointListContainer;
@@ -30,6 +31,7 @@ export default class PointPresenter {
 
   init(point) {
     this.#point = point;
+    this.#isPending = false;
 
     const prevPointComponent = this.#pointComponent;
     const prevPointEditComponent = this.#pointEditComponent;
@@ -75,10 +77,48 @@ export default class PointPresenter {
   }
 
   resetView() {
-    if (this.#mode !== Mode.DEFAULT) {
+    if (this.#mode !== Mode.DEFAULT && !this.#isPending) {
       this.#pointEditComponent.reset(this.#point);
       this.#replaceFormToCard();
     }
+  }
+
+  setSaving() {
+    if (this.#mode === Mode.EDITING) {
+      this.#isPending = true;
+      this.#pointEditComponent.updateElement({
+        isDisabled: true,
+        isSaving: true,
+      });
+    }
+  }
+
+  setDeleting() {
+    if (this.#mode === Mode.EDITING) {
+      this.#isPending = true;
+      this.#pointEditComponent.updateElement({
+        isDisabled: true,
+        isDeleting: true,
+      });
+    }
+  }
+
+  setAborting() {
+    if (this.#mode === Mode.DEFAULT) {
+      this.#pointComponent.shake();
+      return;
+    }
+
+    const resetFormState = () => {
+      this.#isPending = false;
+      this.#pointEditComponent.updateElement({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false,
+      });
+    };
+
+    this.#pointEditComponent.shake(resetFormState);
   }
 
   #replaceCardToForm() {
@@ -95,6 +135,10 @@ export default class PointPresenter {
   }
 
   #escKeydownHandler = (evt) => {
+    if (this.#isPending) {
+      return;
+    }
+
     if (isEscapeKey(evt)) {
       evt.preventDefault();
       this.#pointEditComponent.reset(this.#point);
@@ -131,6 +175,10 @@ export default class PointPresenter {
   };
 
   #handleRollupClick = () => {
+    if (this.#isPending) {
+      return;
+    }
+
     this.#pointEditComponent.reset(this.#point);
     this.#replaceFormToCard();
   };
