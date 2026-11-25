@@ -2,15 +2,15 @@ import he from 'he';
 import AbstractView from '../framework/view/abstract-view.js';
 import {
   humanizePointDate,
-  formatPointDateAttr,
+  formatPointDateAttribute,
   humanizePointTime,
-  formatPointDateTimeAttr,
+  formatPointDateTimeAttribute,
   getPointDuration,
 } from '../utils/date.js';
 
-function createSelectedOffersTemplate(offers, selectedOfferIds) {
-  const selectedOfferIdSet = new Set(selectedOfferIds);
-  const selectedOffers = offers.filter((offer) => selectedOfferIdSet.has(offer.id));
+function createSelectedOffersTemplate(offers, offerIds) {
+  const selectedOfferIds = new Set(offerIds);
+  const selectedOffers = offers.filter((offer) => selectedOfferIds.has(offer.id));
 
   if (selectedOffers.length === 0) {
     return '';
@@ -43,16 +43,16 @@ function createPointTemplate({point, destination, offers}) {
   return (
     `<li class="trip-events__item">
       <div class="event">
-        <time class="event__date" datetime="${formatPointDateAttr(dateFrom)}">${humanizePointDate(dateFrom)}</time>
+        <time class="event__date" datetime="${formatPointDateAttribute(dateFrom)}">${humanizePointDate(dateFrom)}</time>
         <div class="event__type">
           <img class="event__type-icon" width="42" height="42" src="img/icons/${he.encode(type)}.png" alt="Event type icon">
         </div>
         <h3 class="event__title">${he.encode(type)} ${destinationName}</h3>
         <div class="event__schedule">
           <p class="event__time">
-            <time class="event__start-time" datetime="${formatPointDateTimeAttr(dateFrom)}">${humanizePointTime(dateFrom)}</time>
+            <time class="event__start-time" datetime="${formatPointDateTimeAttribute(dateFrom)}">${humanizePointTime(dateFrom)}</time>
             &mdash;
-            <time class="event__end-time" datetime="${formatPointDateTimeAttr(dateTo)}">${humanizePointTime(dateTo)}</time>
+            <time class="event__end-time" datetime="${formatPointDateTimeAttribute(dateTo)}">${humanizePointTime(dateTo)}</time>
           </p>
           <p class="event__duration">${getPointDuration(dateFrom, dateTo)}</p>
         </div>
