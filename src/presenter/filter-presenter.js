@@ -4,14 +4,14 @@ import {filter} from '../utils/filter.js';
 import FilterView from '../view/filter-view.js';
 
 export default class FilterPresenter {
-  #filterContainer = null;
+  #filterContainerElement = null;
   #filterModel = null;
   #pointsModel = null;
 
   #filterComponent = null;
 
-  constructor({filterContainer, filterModel, pointsModel}) {
-    this.#filterContainer = filterContainer;
+  constructor({filterContainerElement, filterModel, pointsModel}) {
+    this.#filterContainerElement = filterContainerElement;
     this.#filterModel = filterModel;
     this.#pointsModel = pointsModel;
 
@@ -39,7 +39,7 @@ export default class FilterPresenter {
     });
 
     if (prevFilterComponent === null) {
-      render(this.#filterComponent, this.#filterContainer);
+      render(this.#filterComponent, this.#filterContainerElement);
       return;
     }
 

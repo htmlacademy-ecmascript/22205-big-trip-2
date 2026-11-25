@@ -59,16 +59,13 @@ export default class NewPointPresenter {
   }
 
   setAborting() {
-    const resetFormState = () => {
-      this.#isPending = false;
-      this.#pointEditComponent.updateElement({
-        isDisabled: false,
-        isSaving: false,
-        isDeleting: false,
-      });
-    };
-
-    this.#pointEditComponent.shake(resetFormState);
+    this.#isPending = false;
+    this.#pointEditComponent.updateElement({
+      isDisabled: false,
+      isSaving: false,
+      isDeleting: false,
+    });
+    this.#pointEditComponent.shake();
   }
 
   #escKeydownHandler = (evt) => {
@@ -83,6 +80,10 @@ export default class NewPointPresenter {
   };
 
   #handleFormSubmit = (point) => {
+    if (this.#isPending) {
+      return;
+    }
+
     this.#handleDataChange(
       UserAction.ADD_POINT,
       UpdateType.MINOR,
@@ -91,6 +92,10 @@ export default class NewPointPresenter {
   };
 
   #handleDeleteClick = () => {
+    if (this.#isPending) {
+      return;
+    }
+
     this.destroy();
   };
 }

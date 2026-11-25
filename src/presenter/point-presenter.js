@@ -10,7 +10,7 @@ const Mode = {
 };
 
 export default class PointPresenter {
-  #pointListContainer = null;
+  #pointListContainerElement = null;
   #pointsModel = null;
   #handleDataChange = null;
   #handleModeChange = null;
@@ -22,8 +22,8 @@ export default class PointPresenter {
   #mode = Mode.DEFAULT;
   #isPending = false;
 
-  constructor({pointListContainer, pointsModel, onDataChange, onModeChange}) {
-    this.#pointListContainer = pointListContainer;
+  constructor({pointListContainerElement, pointsModel, onDataChange, onModeChange}) {
+    this.#pointListContainerElement = pointListContainerElement;
     this.#pointsModel = pointsModel;
     this.#handleDataChange = onDataChange;
     this.#handleModeChange = onModeChange;
@@ -54,7 +54,7 @@ export default class PointPresenter {
     });
 
     if (prevPointComponent === null || prevPointEditComponent === null) {
-      render(this.#pointComponent, this.#pointListContainer);
+      render(this.#pointComponent, this.#pointListContainerElement);
       return;
     }
 
@@ -109,16 +109,13 @@ export default class PointPresenter {
       return;
     }
 
-    const resetFormState = () => {
-      this.#isPending = false;
-      this.#pointEditComponent.updateElement({
-        isDisabled: false,
-        isSaving: false,
-        isDeleting: false,
-      });
-    };
-
-    this.#pointEditComponent.shake(resetFormState);
+    this.#isPending = false;
+    this.#pointEditComponent.updateElement({
+      isDisabled: false,
+      isSaving: false,
+      isDeleting: false,
+    });
+    this.#pointEditComponent.shake();
   }
 
   #replaceCardToForm() {
@@ -159,6 +156,10 @@ export default class PointPresenter {
   };
 
   #handleFormSubmit = (update) => {
+    if (this.#isPending) {
+      return;
+    }
+
     this.#handleDataChange(
       UserAction.UPDATE_POINT,
       UpdateType.MINOR,
@@ -167,6 +168,10 @@ export default class PointPresenter {
   };
 
   #handleDeleteClick = (point) => {
+    if (this.#isPending) {
+      return;
+    }
+
     this.#handleDataChange(
       UserAction.DELETE_POINT,
       UpdateType.MINOR,

@@ -12,7 +12,7 @@ import NewPointPresenter from './new-point-presenter.js';
 
 const TimeLimit = {
   LOWER_LIMIT: 350,
-  UPPER_LIMIT: 1000,
+  UPPER_LIMIT: 500,
 };
 
 export default class TripPresenter {
@@ -109,7 +109,7 @@ export default class TripPresenter {
 
   #renderPoint(point) {
     const pointPresenter = new PointPresenter({
-      pointListContainer: this.#pointListComponent.element,
+      pointListContainerElement: this.#pointListComponent.element,
       pointsModel: this.#pointsModel,
       onDataChange: this.#handleViewAction,
       onModeChange: this.#handleModeChange,
