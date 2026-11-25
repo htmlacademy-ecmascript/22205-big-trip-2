@@ -148,7 +148,7 @@ function createPointEditTemplate({state, destinations, offers}) {
     isDeleting,
   } = state;
   const isEditMode = Boolean(id);
-  const pointId = id || 'new';
+  const pointId = id ? he.encode(id) : 'new';
   const disabledAttribute = isDisabled ? 'disabled' : '';
 
   const currentDestination = destinations.find((item) => item.id === destinationId) || null;
@@ -163,7 +163,7 @@ function createPointEditTemplate({state, destinations, offers}) {
   const deleteButtonText = isDeleting ? 'Deleting...' : 'Delete';
   const resetButtonText = isEditMode ? deleteButtonText : 'Cancel';
   const rollupButtonTemplate = isEditMode
-    ? `<button class="event__rollup-btn" type="button" ${disabledAttribute}>
+    ? `<button class="event__rollup-btn" type="button">
         <span class="visually-hidden">Open event</span>
       </button>`
     : '';
@@ -221,7 +221,7 @@ function createPointEditTemplate({state, destinations, offers}) {
           </div>
 
           <button class="event__save-btn  btn  btn--blue" type="submit" ${disabledAttribute}>${saveButtonText}</button>
-          <button class="event__reset-btn" type="reset" ${disabledAttribute}>${resetButtonText}</button>
+          <button class="event__reset-btn" type="reset">${resetButtonText}</button>
           ${rollupButtonTemplate}
         </header>
         ${detailsTemplate}
@@ -280,12 +280,6 @@ export default class PointEditView extends AbstractStatefulView {
     }
   }
 
-  reset(point) {
-    this.updateElement(
-      PointEditView.parsePointToState(point)
-    );
-  }
-
   _restoreHandlers() {
     this.element.querySelector('form')
       .addEventListener('submit', this.#formSubmitHandler);
@@ -309,6 +303,12 @@ export default class PointEditView extends AbstractStatefulView {
       .addEventListener('input', this.#priceInputHandler);
 
     this.#setDatepickers();
+  }
+
+  reset(point) {
+    this.updateElement(
+      PointEditView.parsePointToState(point)
+    );
   }
 
   #setDatepickers() {
@@ -351,6 +351,10 @@ export default class PointEditView extends AbstractStatefulView {
   #formSubmitHandler = (evt) => {
     evt.preventDefault();
 
+    if (this._state.isDisabled) {
+      return;
+    }
+
     if (!this.#isValidState()) {
       this.shake();
       return;
@@ -361,11 +365,21 @@ export default class PointEditView extends AbstractStatefulView {
 
   #deleteClickHandler = (evt) => {
     evt.preventDefault();
+
+    if (this._state.isDisabled) {
+      return;
+    }
+
     this.#handleDeleteClick(PointEditView.parseStateToPoint(this._state));
   };
 
   #rollupClickHandler = (evt) => {
     evt.preventDefault();
+
+    if (this._state.isDisabled) {
+      return;
+    }
+
     this.#handleRollupClick();
   };
 

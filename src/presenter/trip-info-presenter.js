@@ -2,13 +2,13 @@ import {RenderPosition, remove, render, replace} from '../framework/render.js';
 import TripInfoView from '../view/trip-info-view.js';
 
 export default class TripInfoPresenter {
-  #tripInfoContainer = null;
+  #tripInfoContainerElement = null;
   #pointsModel = null;
 
   #tripInfoComponent = null;
 
-  constructor({tripInfoContainer, pointsModel}) {
-    this.#tripInfoContainer = tripInfoContainer;
+  constructor({tripInfoContainerElement, pointsModel}) {
+    this.#tripInfoContainerElement = tripInfoContainerElement;
     this.#pointsModel = pointsModel;
 
     this.#pointsModel.addObserver(this.#handleModelEvent);
@@ -33,7 +33,7 @@ export default class TripInfoPresenter {
     });
 
     if (prevTripInfoComponent === null) {
-      render(this.#tripInfoComponent, this.#tripInfoContainer, RenderPosition.AFTERBEGIN);
+      render(this.#tripInfoComponent, this.#tripInfoContainerElement, RenderPosition.AFTERBEGIN);
       return;
     }
 

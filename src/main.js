@@ -19,12 +19,12 @@ const pointsModel = new PointsModel({
 const filterModel = new FilterModel();
 
 const tripInfoPresenter = new TripInfoPresenter({
-  tripInfoContainer: tripMainElement,
+  tripInfoContainerElement: tripMainElement,
   pointsModel,
 });
 
 const filterPresenter = new FilterPresenter({
-  filterContainer: tripFiltersElement,
+  filterContainerElement: tripFiltersElement,
   filterModel,
   pointsModel,
 });
