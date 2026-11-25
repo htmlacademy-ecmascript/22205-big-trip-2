@@ -10,6 +10,7 @@ export default class NewPointPresenter {
   #handleDestroy = null;
 
   #pointEditComponent = null;
+  #isPending = false;
 
   constructor({pointListComponent, pointsModel, onDataChange, onDestroy}) {
     this.#pointListComponent = pointListComponent;
@@ -23,6 +24,7 @@ export default class NewPointPresenter {
       return;
     }
 
+    this.#isPending = false;
     this.#pointEditComponent = new PointEditView({
       destinations: this.#pointsModel.destinations,
       offers: this.#pointsModel.offers,
@@ -40,6 +42,7 @@ export default class NewPointPresenter {
       return;
     }
 
+    this.#isPending = false;
     remove(this.#pointEditComponent);
     this.#pointEditComponent = null;
 
@@ -47,7 +50,32 @@ export default class NewPointPresenter {
     this.#handleDestroy();
   }
 
+  setSaving() {
+    this.#isPending = true;
+    this.#pointEditComponent.updateElement({
+      isDisabled: true,
+      isSaving: true,
+    });
+  }
+
+  setAborting() {
+    const resetFormState = () => {
+      this.#isPending = false;
+      this.#pointEditComponent.updateElement({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false,
+      });
+    };
+
+    this.#pointEditComponent.shake(resetFormState);
+  }
+
   #escKeydownHandler = (evt) => {
+    if (this.#isPending) {
+      return;
+    }
+
     if (isEscapeKey(evt)) {
       evt.preventDefault();
       this.destroy();
@@ -60,7 +88,6 @@ export default class NewPointPresenter {
       UpdateType.MINOR,
       point
     );
-    this.destroy();
   };
 
   #handleDeleteClick = () => {
