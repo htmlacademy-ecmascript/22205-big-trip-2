@@ -30,7 +30,7 @@ export default class FilterPresenter {
 
   init() {
     const filters = this.filters;
-    const prevFilterComponent = this.#filterComponent;
+    const previousFilterComponent = this.#filterComponent;
 
     this.#filterComponent = new FilterView({
       filters,
@@ -38,13 +38,13 @@ export default class FilterPresenter {
       onFilterTypeChange: this.#handleFilterTypeChange,
     });
 
-    if (prevFilterComponent === null) {
+    if (previousFilterComponent === null) {
       render(this.#filterComponent, this.#filterContainerElement);
       return;
     }
 
-    replace(this.#filterComponent, prevFilterComponent);
-    remove(prevFilterComponent);
+    replace(this.#filterComponent, previousFilterComponent);
+    remove(previousFilterComponent);
   }
 
   #handleModelEvent = () => {

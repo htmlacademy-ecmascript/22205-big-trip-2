@@ -134,6 +134,99 @@ function createDestinationSectionTemplate(destination) {
   );
 }
 
+function createEventTypeSelectorTemplate(type, pointId, isDisabled) {
+  const disabledAttribute = isDisabled ? 'disabled' : '';
+  const typeItemsTemplate = POINT_TYPES
+    .map((pointType) => createEventTypeItemTemplate(pointType, type, pointId, isDisabled))
+    .join('');
+
+  return (
+    `<div class="event__type-wrapper">
+      <label class="event__type  event__type-btn" for="event-type-toggle-${pointId}">
+        <span class="visually-hidden">Choose event type</span>
+        <img class="event__type-icon" width="17" height="17" src="img/icons/${he.encode(type)}.png" alt="Event type icon">
+      </label>
+      <input class="event__type-toggle  visually-hidden" id="event-type-toggle-${pointId}" type="checkbox" ${disabledAttribute}>
+
+      <div class="event__type-list">
+        <fieldset class="event__type-group">
+          <legend class="visually-hidden">Event type</legend>
+          ${typeItemsTemplate}
+        </fieldset>
+      </div>
+    </div>`
+  );
+}
+
+function createDestinationFieldTemplate({type, destinationName, destinations, pointId, disabledAttribute}) {
+  return (
+    `<div class="event__field-group  event__field-group--destination">
+      <label class="event__label  event__type-output" for="event-destination-${pointId}">
+        ${he.encode(type)}
+      </label>
+      <input class="event__input  event__input--destination" id="event-destination-${pointId}" type="text" name="event-destination" value="${destinationName}" list="destination-list-${pointId}" ${disabledAttribute}>
+      ${createDestinationListTemplate(destinations, pointId)}
+    </div>`
+  );
+}
+
+function createTimeFieldTemplate({dateFrom, dateTo, pointId, disabledAttribute}) {
+  return (
+    `<div class="event__field-group  event__field-group--time">
+      <label class="visually-hidden" for="event-start-time-${pointId}">From</label>
+      <input class="event__input  event__input--time" id="event-start-time-${pointId}" type="text" name="event-start-time" value="${formatEditDateTime(dateFrom)}" ${disabledAttribute}>
+      &mdash;
+      <label class="visually-hidden" for="event-end-time-${pointId}">To</label>
+      <input class="event__input  event__input--time" id="event-end-time-${pointId}" type="text" name="event-end-time" value="${formatEditDateTime(dateTo)}" ${disabledAttribute}>
+    </div>`
+  );
+}
+
+function createPriceFieldTemplate({basePrice, pointId, disabledAttribute}) {
+  return (
+    `<div class="event__field-group  event__field-group--price">
+      <label class="event__label" for="event-price-${pointId}">
+        <span class="visually-hidden">Price</span>
+        &euro;
+      </label>
+      <input class="event__input  event__input--price" id="event-price-${pointId}" type="text" name="event-price" value="${basePrice}" ${disabledAttribute}>
+    </div>`
+  );
+}
+
+function createFormButtonsTemplate({isEditMode, isSaving, isDeleting, disabledAttribute}) {
+  const saveButtonText = isSaving ? 'Saving...' : 'Save';
+  const deleteButtonText = isDeleting ? 'Deleting...' : 'Delete';
+  const resetButtonText = isEditMode ? deleteButtonText : 'Cancel';
+  const rollupButtonTemplate = isEditMode
+    ? `<button class="event__rollup-btn" type="button">
+        <span class="visually-hidden">Open event</span>
+      </button>`
+    : '';
+
+  return (
+    `<button class="event__save-btn  btn  btn--blue" type="submit" ${disabledAttribute}>${saveButtonText}</button>
+    <button class="event__reset-btn" type="reset">${resetButtonText}</button>
+    ${rollupButtonTemplate}`
+  );
+}
+
+function createDetailsSectionTemplate({availableOffers, selectedOfferIds, currentDestination, pointId, isDisabled}) {
+  const offersSectionTemplate = createOffersSectionTemplate(availableOffers, selectedOfferIds, pointId, isDisabled);
+  const destinationSectionTemplate = createDestinationSectionTemplate(currentDestination);
+
+  if (!offersSectionTemplate && !destinationSectionTemplate) {
+    return '';
+  }
+
+  return (
+    `<section class="event__details">
+      ${offersSectionTemplate}
+      ${destinationSectionTemplate}
+    </section>`
+  );
+}
+
 function createPointEditTemplate({state, destinations, offers}) {
   const {
     id,
@@ -154,75 +247,36 @@ function createPointEditTemplate({state, destinations, offers}) {
   const currentDestination = destinations.find((item) => item.id === destinationId) || null;
   const typeOffersGroup = offers.find((item) => item.type === type);
   const availableOffers = typeOffersGroup ? typeOffersGroup.offers : [];
-
-  const typeItemsTemplate = POINT_TYPES
-    .map((pointType) => createEventTypeItemTemplate(pointType, type, pointId, isDisabled))
-    .join('');
   const destinationName = currentDestination ? he.encode(currentDestination.name) : '';
-  const saveButtonText = isSaving ? 'Saving...' : 'Save';
-  const deleteButtonText = isDeleting ? 'Deleting...' : 'Delete';
-  const resetButtonText = isEditMode ? deleteButtonText : 'Cancel';
-  const rollupButtonTemplate = isEditMode
-    ? `<button class="event__rollup-btn" type="button">
-        <span class="visually-hidden">Open event</span>
-      </button>`
-    : '';
 
-  const offersSectionTemplate = createOffersSectionTemplate(availableOffers, selectedOfferIds, pointId, isDisabled);
-  const destinationSectionTemplate = createDestinationSectionTemplate(currentDestination);
-  const detailsTemplate = offersSectionTemplate || destinationSectionTemplate
-    ? `<section class="event__details">
-        ${offersSectionTemplate}
-        ${destinationSectionTemplate}
-      </section>`
-    : '';
+  const eventTypeSelectorTemplate = createEventTypeSelectorTemplate(type, pointId, isDisabled);
+  const destinationFieldTemplate = createDestinationFieldTemplate({
+    type,
+    destinationName,
+    destinations,
+    pointId,
+    disabledAttribute,
+  });
+  const timeFieldTemplate = createTimeFieldTemplate({dateFrom, dateTo, pointId, disabledAttribute});
+  const priceFieldTemplate = createPriceFieldTemplate({basePrice, pointId, disabledAttribute});
+  const formButtonsTemplate = createFormButtonsTemplate({isEditMode, isSaving, isDeleting, disabledAttribute});
+  const detailsTemplate = createDetailsSectionTemplate({
+    availableOffers,
+    selectedOfferIds,
+    currentDestination,
+    pointId,
+    isDisabled,
+  });
 
   return (
     `<li class="trip-events__item">
       <form class="event event--edit" action="#" method="post">
         <header class="event__header">
-          <div class="event__type-wrapper">
-            <label class="event__type  event__type-btn" for="event-type-toggle-${pointId}">
-              <span class="visually-hidden">Choose event type</span>
-              <img class="event__type-icon" width="17" height="17" src="img/icons/${he.encode(type)}.png" alt="Event type icon">
-            </label>
-            <input class="event__type-toggle  visually-hidden" id="event-type-toggle-${pointId}" type="checkbox" ${disabledAttribute}>
-
-            <div class="event__type-list">
-              <fieldset class="event__type-group">
-                <legend class="visually-hidden">Event type</legend>
-                ${typeItemsTemplate}
-              </fieldset>
-            </div>
-          </div>
-
-          <div class="event__field-group  event__field-group--destination">
-            <label class="event__label  event__type-output" for="event-destination-${pointId}">
-              ${he.encode(type)}
-            </label>
-            <input class="event__input  event__input--destination" id="event-destination-${pointId}" type="text" name="event-destination" value="${destinationName}" list="destination-list-${pointId}" ${disabledAttribute}>
-            ${createDestinationListTemplate(destinations, pointId)}
-          </div>
-
-          <div class="event__field-group  event__field-group--time">
-            <label class="visually-hidden" for="event-start-time-${pointId}">From</label>
-            <input class="event__input  event__input--time" id="event-start-time-${pointId}" type="text" name="event-start-time" value="${formatEditDateTime(dateFrom)}" ${disabledAttribute}>
-            &mdash;
-            <label class="visually-hidden" for="event-end-time-${pointId}">To</label>
-            <input class="event__input  event__input--time" id="event-end-time-${pointId}" type="text" name="event-end-time" value="${formatEditDateTime(dateTo)}" ${disabledAttribute}>
-          </div>
-
-          <div class="event__field-group  event__field-group--price">
-            <label class="event__label" for="event-price-${pointId}">
-              <span class="visually-hidden">Price</span>
-              &euro;
-            </label>
-            <input class="event__input  event__input--price" id="event-price-${pointId}" type="text" name="event-price" value="${basePrice}" ${disabledAttribute}>
-          </div>
-
-          <button class="event__save-btn  btn  btn--blue" type="submit" ${disabledAttribute}>${saveButtonText}</button>
-          <button class="event__reset-btn" type="reset">${resetButtonText}</button>
-          ${rollupButtonTemplate}
+          ${eventTypeSelectorTemplate}
+          ${destinationFieldTemplate}
+          ${timeFieldTemplate}
+          ${priceFieldTemplate}
+          ${formButtonsTemplate}
         </header>
         ${detailsTemplate}
       </form>

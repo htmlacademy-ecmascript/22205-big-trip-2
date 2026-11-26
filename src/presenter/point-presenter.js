@@ -33,8 +33,8 @@ export default class PointPresenter {
     this.#point = point;
     this.#isPending = false;
 
-    const prevPointComponent = this.#pointComponent;
-    const prevPointEditComponent = this.#pointEditComponent;
+    const previousPointComponent = this.#pointComponent;
+    const previousPointEditComponent = this.#pointEditComponent;
 
     this.#pointComponent = new PointView({
       point: this.#point,
@@ -53,26 +53,29 @@ export default class PointPresenter {
       onRollupClick: this.#handleRollupClick,
     });
 
-    if (prevPointComponent === null || prevPointEditComponent === null) {
+    if (previousPointComponent === null || previousPointEditComponent === null) {
       render(this.#pointComponent, this.#pointListContainerElement);
       return;
     }
 
     if (this.#mode === Mode.DEFAULT) {
-      replace(this.#pointComponent, prevPointComponent);
+      replace(this.#pointComponent, previousPointComponent);
     }
 
     if (this.#mode === Mode.EDITING) {
-      replace(this.#pointEditComponent, prevPointEditComponent);
+      replace(this.#pointEditComponent, previousPointEditComponent);
     }
 
-    remove(prevPointComponent);
-    remove(prevPointEditComponent);
+    remove(previousPointComponent);
+    remove(previousPointEditComponent);
   }
 
   destroy() {
+    this.#isPending = false;
     remove(this.#pointComponent);
     remove(this.#pointEditComponent);
+    this.#pointComponent = null;
+    this.#pointEditComponent = null;
     document.removeEventListener('keydown', this.#escKeydownHandler);
   }
 
@@ -84,7 +87,7 @@ export default class PointPresenter {
   }
 
   setSaving() {
-    if (this.#mode === Mode.EDITING) {
+    if (this.#mode === Mode.EDITING && this.#pointEditComponent !== null) {
       this.#isPending = true;
       this.#pointEditComponent.updateElement({
         isDisabled: true,
@@ -94,7 +97,7 @@ export default class PointPresenter {
   }
 
   setDeleting() {
-    if (this.#mode === Mode.EDITING) {
+    if (this.#mode === Mode.EDITING && this.#pointEditComponent !== null) {
       this.#isPending = true;
       this.#pointEditComponent.updateElement({
         isDisabled: true,
@@ -105,7 +108,11 @@ export default class PointPresenter {
 
   setAborting() {
     if (this.#mode === Mode.DEFAULT) {
-      this.#pointComponent.shake();
+      this.#pointComponent?.shake();
+      return;
+    }
+
+    if (this.#pointEditComponent === null) {
       return;
     }
 
