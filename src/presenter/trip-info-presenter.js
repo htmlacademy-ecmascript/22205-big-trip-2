@@ -16,11 +16,11 @@ export default class TripInfoPresenter {
 
   init() {
     const points = this.#pointsModel.points;
-    const prevTripInfoComponent = this.#tripInfoComponent;
+    const previousTripInfoComponent = this.#tripInfoComponent;
 
     if (points.length === 0) {
-      if (prevTripInfoComponent !== null) {
-        remove(prevTripInfoComponent);
+      if (previousTripInfoComponent !== null) {
+        remove(previousTripInfoComponent);
         this.#tripInfoComponent = null;
       }
       return;
@@ -32,13 +32,13 @@ export default class TripInfoPresenter {
       offers: this.#pointsModel.offers,
     });
 
-    if (prevTripInfoComponent === null) {
+    if (previousTripInfoComponent === null) {
       render(this.#tripInfoComponent, this.#tripInfoContainerElement, RenderPosition.AFTERBEGIN);
       return;
     }
 
-    replace(this.#tripInfoComponent, prevTripInfoComponent);
-    remove(prevTripInfoComponent);
+    replace(this.#tripInfoComponent, previousTripInfoComponent);
+    remove(previousTripInfoComponent);
   }
 
   #handleModelEvent = () => {

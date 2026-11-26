@@ -51,6 +51,10 @@ export default class NewPointPresenter {
   }
 
   setSaving() {
+    if (this.#pointEditComponent === null) {
+      return;
+    }
+
     this.#isPending = true;
     this.#pointEditComponent.updateElement({
       isDisabled: true,
@@ -59,6 +63,10 @@ export default class NewPointPresenter {
   }
 
   setAborting() {
+    if (this.#pointEditComponent === null) {
+      return;
+    }
+
     this.#isPending = false;
     this.#pointEditComponent.updateElement({
       isDisabled: false,
